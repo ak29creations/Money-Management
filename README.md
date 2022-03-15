@@ -1,7 +1,6 @@
 # money_management
 
 A new Flutter project.
-![Add Category](https://user-images.githubusercontent.com/46015763/158312242-640eef71-9b47-4815-b86c-e99a093a38ba.jpeg)
 
 ## Getting Started
 

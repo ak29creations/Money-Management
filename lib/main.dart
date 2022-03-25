@@ -27,10 +27,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ScreenHome(),
+      home: const ScreenHome(),
       routes: {
         AddTransaction.routeName:(ctx)=> const AddTransaction(),
       },

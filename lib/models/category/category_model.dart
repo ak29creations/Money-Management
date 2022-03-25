@@ -5,10 +5,11 @@ part 'category_model.g.dart';
 enum CategoryType {
   @HiveField(0)
   income,
-  
+
   @HiveField(1)
   expense,
 }
+
 @HiveType(typeId: 1)
 class CategoryModel {
   @HiveField(0)
@@ -20,10 +21,9 @@ class CategoryModel {
   @HiveField(3)
   final CategoryType type;
 
-  CategoryModel({
-    required this.name,
-    required this.type,
-    this.isDeleted = false,
-    this.id
-  });
+  CategoryModel(
+      {required this.name,
+      required this.type,
+      this.isDeleted = false,
+      this.id});
 }

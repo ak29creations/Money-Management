@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:money_management/db/category/category_db.dart';
+import 'package:money_management/db/transactions/transaction_db.dart';
 import 'package:money_management/models/category/category_model.dart';
+import 'package:money_management/models/transaction/transaction_model.dart';
 
 class IncomeCategoryList extends StatelessWidget {
   const IncomeCategoryList({Key? key}) : super(key: key);
@@ -18,8 +20,22 @@ class IncomeCategoryList extends StatelessWidget {
                 child: ListTile(
                   title: Text(category.name),
                   trailing: IconButton(
-                    onPressed: () {
-                      CategoryDB.instance.deleteCategory(category.id!);
+                    onPressed: () async {
+                      List<TransactionModel> result =
+                          await TransactionDB.instance.getTransactionCategories(
+                              category.type, category.name);
+
+                      if (result.isEmpty) {
+                        CategoryDB.instance.deleteCategory(category.id!);
+                      } else {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                "Can’t Delete this Category. Transactions have been made."),
+                          ),
+                        );
+                      }
                     },
                     icon: const Icon(
                       Icons.delete,
@@ -30,7 +46,7 @@ class IncomeCategoryList extends StatelessWidget {
               );
             },
             separatorBuilder: (ctx, index) {
-              return SizedBox(
+              return const SizedBox(
                 height: 5,
               );
             },

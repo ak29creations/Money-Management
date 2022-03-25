@@ -24,7 +24,7 @@ class ScreenTransaction extends StatelessWidget {
               return Slidable(
                 key: Key(_value.id.toString()),
                 startActionPane: ActionPane(
-                  motion:DrawerMotion(),
+                  motion: const DrawerMotion(),
                   children: [
                     SlidableAction(
                       onPressed: (ctx) {
@@ -44,14 +44,14 @@ class ScreenTransaction extends StatelessWidget {
                       child: Text(
                         parseDate(_value.date),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13),
+                        style: const TextStyle(fontSize: 13),
                       ),
                       backgroundColor: _value.type == CategoryType.income
                           ? Colors.green
                           : Colors.red,
                     ),
                     title: Text("RS ${_value.amount.toString()}"),
-                    subtitle: Text(_value.category.name),
+                    subtitle: Text(_value.category.name+" - "+_value.purpose),
                   ),
                 ),
               );
@@ -67,8 +67,8 @@ class ScreenTransaction extends StatelessWidget {
   }
 
   String parseDate(DateTime date) {
-    final _date = DateFormat.yMMMEd().format(date);
-    final _splitedDate = _date.split(',');
-    return '${_splitedDate[1]}\n${_splitedDate[2]}';
+   
+    final _date = DateFormat('MMM d\nyyyy').format(date);
+    return _date;
   }
 }

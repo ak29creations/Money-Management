@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/models/category/category_model.dart';
 
-const CATEGORY_DB_NAME = "category_db";
+const categoryDb = "category_db";
 
 abstract class CategoryDbFunctions {
   Future<List<CategoryModel>> getCategories();
@@ -26,7 +26,7 @@ class CategoryDB implements CategoryDbFunctions {
 
   @override
   Future<void> insertCategory(CategoryModel value) async {
-    final _categoryDB = await Hive.openBox<CategoryModel>(CATEGORY_DB_NAME);
+    final _categoryDB = await Hive.openBox<CategoryModel>(categoryDb);
     final _id = await _categoryDB.add(value);
     value.id = _id;
     await _categoryDB.put(_id, value);
@@ -35,7 +35,7 @@ class CategoryDB implements CategoryDbFunctions {
 
   @override
   Future<List<CategoryModel>> getCategories() async {
-    final _categoryDB = await Hive.openBox<CategoryModel>(CATEGORY_DB_NAME);
+    final _categoryDB = await Hive.openBox<CategoryModel>(categoryDb);
     return _categoryDB.values.toList();
   }
 
@@ -59,7 +59,7 @@ class CategoryDB implements CategoryDbFunctions {
 
   @override
   Future<void> deleteCategory(int categoryID) async {
-    final _categoryDB = await Hive.openBox<CategoryModel>(CATEGORY_DB_NAME);
+    final _categoryDB = await Hive.openBox<CategoryModel>(categoryDb);
     await _categoryDB.delete(categoryID);
     refreshUI();
   }

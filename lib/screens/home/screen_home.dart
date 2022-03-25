@@ -19,7 +19,7 @@ class ScreenHome extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text("MONEY MANAGER"),
+        title: const Text("MONEY MANAGER"),
         centerTitle: true,
       ),
       bottomNavigationBar: const MoneyManagementBottomNavigation(),
@@ -38,7 +38,7 @@ class ScreenHome extends StatelessWidget {
             showCategoryAddPopup(context);
           }
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

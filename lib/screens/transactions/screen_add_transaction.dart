@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:money_management/db/category/category_db.dart';
 import 'package:money_management/db/transactions/transaction_db.dart';
 import 'package:money_management/models/category/category_model.dart';
@@ -17,7 +18,7 @@ class _AddTransactionState extends State<AddTransaction> {
   CategoryType? _selectedCategoryType;
   CategoryModel? _selectedCategoryModel;
 
-  String? _CategoryID;
+  String? _categoryID;
 
   final _purposeTextEditingController = TextEditingController();
   final _amountTextEditingController = TextEditingController();
@@ -54,6 +55,7 @@ class _AddTransactionState extends State<AddTransaction> {
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(), hintText: 'Amount'),
               ),
+              const SizedBox(height: 10,),
               //Date
               TextButton.icon(
                 onPressed: () async {
@@ -72,11 +74,12 @@ class _AddTransactionState extends State<AddTransaction> {
                     });
                   }
                 },
-                icon: const Icon(Icons.calendar_today),
+                icon: const Icon(Icons.calendar_month),
                 label: Text(
                   _selectedDate == null
                       ? 'Select Date'
-                      : _selectedDate.toString(),
+                      : DateFormat('dd-MM-yyyy')
+                          .format(_selectedDate!),
                 ),
               ),
               //Category
@@ -91,7 +94,7 @@ class _AddTransactionState extends State<AddTransaction> {
                           onChanged: (newValue) {
                             setState(() {
                               _selectedCategoryType = CategoryType.income;
-                              _CategoryID = null;
+                              _categoryID = null;
                             });
                           }),
                       const Text('Income'),
@@ -105,7 +108,7 @@ class _AddTransactionState extends State<AddTransaction> {
                           onChanged: (newValue) {
                             setState(() {
                               _selectedCategoryType = CategoryType.expense;
-                              _CategoryID = null;
+                              _categoryID = null;
                             });
                           }),
                       const Text('Expense'),
@@ -114,36 +117,44 @@ class _AddTransactionState extends State<AddTransaction> {
                 ],
               ),
               //Category Type
-              DropdownButton<String>(
-                hint: const Text('Select Category'),
-                value: _CategoryID,
-                items: (_selectedCategoryType == CategoryType.income
-                        ? CategoryDB.instance.incomeCategoryListListener
-                        : CategoryDB.instance.expenseCategoryListListener)
-                    .value
-                    .map(
-                  (e) {
-                    return DropdownMenuItem(
-                      value: e.id.toString(),
-                      child: Text(e.name),
-                      onTap: () {
-                        _selectedCategoryModel = e;
-                      },
-                    );
+              Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: DropdownButton<String>(
+                  hint: const Text('Select Category'),
+                  value: _categoryID,
+                  items: (_selectedCategoryType == CategoryType.income
+                          ? CategoryDB.instance.incomeCategoryListListener
+                          : CategoryDB.instance.expenseCategoryListListener)
+                      .value
+                      .map(
+                    (e) {
+                      return DropdownMenuItem(
+                        value: e.id.toString(),
+                        child: Text(e.name),
+                        onTap: () {
+                          _selectedCategoryModel = e;
+                        },
+                      );
+                    },
+                  ).toList(),
+                  onChanged: (selectedValue) {
+                    setState(() {
+                      _categoryID = selectedValue;
+                    });
                   },
-                ).toList(),
-                onChanged: (selectedValue) {
-                  setState(() {
-                    _CategoryID = selectedValue;
-                  });
-                },
+                ),
               ),
               //Submit
-              ElevatedButton(
-                onPressed: () {
-                  addTransaction();
-                },
-                child: const Text('Submit'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      addTransaction();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -161,7 +172,7 @@ class _AddTransactionState extends State<AddTransaction> {
     if (_amountText.isEmpty) {
       return;
     }
-    if (_CategoryID == null) {
+    if (_categoryID == null) {
       return;
     }
     if (_selectedDate == null) {

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:money_management/models/category/category_model.dart';
 import 'package:money_management/models/transaction/transaction_model.dart';
 
-const TRANSACTION_DB_NAME = "transaction_db";
+const transactionDb = "transaction_db";
 
 abstract class TransactionDbFunctions {
   Future<List<TransactionModel>> getallTransactions();
+  Future<List<TransactionModel>> getTransactionCategories(
+      CategoryType type, String name);
   Future<void> insertTransaction(TransactionModel value);
   Future<void> deleteTransaction(int id);
 }
@@ -31,15 +34,13 @@ class TransactionDB implements TransactionDbFunctions {
 
   @override
   Future<List<TransactionModel>> getallTransactions() async {
-    final _transactionDB =
-        await Hive.openBox<TransactionModel>(TRANSACTION_DB_NAME);
+    final _transactionDB = await Hive.openBox<TransactionModel>(transactionDb);
     return _transactionDB.values.toList();
   }
 
   @override
   Future<void> insertTransaction(TransactionModel value) async {
-    final _transactionDB =
-        await Hive.openBox<TransactionModel>(TRANSACTION_DB_NAME);
+    final _transactionDB = await Hive.openBox<TransactionModel>(transactionDb);
     final _id = await _transactionDB.add(value);
     value.id = _id;
     await _transactionDB.put(_id, value);
@@ -48,9 +49,19 @@ class TransactionDB implements TransactionDbFunctions {
 
   @override
   Future<void> deleteTransaction(int id) async {
-    final _transactionDB =
-        await Hive.openBox<TransactionModel>(TRANSACTION_DB_NAME);
+    final _transactionDB = await Hive.openBox<TransactionModel>(transactionDb);
     _transactionDB.delete(id);
     refresh();
+  }
+
+  @override
+  Future<List<TransactionModel>> getTransactionCategories(
+      CategoryType type, String name) async {
+    final _transactionDB = await Hive.openBox<TransactionModel>(transactionDb);
+    var result = _transactionDB.values
+        .where((val) => val.category.name == name)
+        .where((val) => val.category.type == type)
+        .toList();
+    return result;
   }
 }

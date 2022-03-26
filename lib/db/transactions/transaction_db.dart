@@ -9,13 +9,13 @@ abstract class TransactionDbFunctions {
   Future<List<TransactionModel>> getallTransactions();
   Future<List<TransactionModel>> getTransactionCategories(
       CategoryType type, String name);
+  Future<void> totalIncomeExpense();
   Future<void> insertTransaction(TransactionModel value);
   Future<void> deleteTransaction(int id);
 }
 
 class TransactionDB implements TransactionDbFunctions {
   TransactionDB._internal();
-
   static TransactionDB instance = TransactionDB._internal();
 
   factory TransactionDB() {
@@ -24,11 +24,16 @@ class TransactionDB implements TransactionDbFunctions {
   ValueNotifier<List<TransactionModel>> transactionListNotifier =
       ValueNotifier([]);
 
+  ValueNotifier<double> incomeTotalNotifier = ValueNotifier(0);
+  ValueNotifier<double> expenseTotalNotifier = ValueNotifier(0);
+  ValueNotifier<double> totalNotifier = ValueNotifier(0);
+
   Future<void> refresh() async {
     final _list = await getallTransactions();
     _list.sort((first, second) => second.date.compareTo(first.date));
     transactionListNotifier.value.clear();
     transactionListNotifier.value.addAll(_list);
+    await totalIncomeExpense();
     transactionListNotifier.notifyListeners();
   }
 
@@ -55,12 +60,39 @@ class TransactionDB implements TransactionDbFunctions {
   }
 
   @override
+  Future<void> totalIncomeExpense() async {
+    final _transactionDB = await Hive.openBox<TransactionModel>(transactionDb);
+    double income = 0;
+    double expense = 0;
+    List<TransactionModel> incomeCategory = _transactionDB.values
+        .where((value) => value.type == CategoryType.income)
+        .toList();
+    List<TransactionModel> expenseCategory = _transactionDB.values
+        .where((value) => value.type == CategoryType.expense)
+        .toList();
+
+    for (int i = 0; i < incomeCategory.length; i++) {
+      income += incomeCategory[i].amount;
+    }
+    for (int i = 0; i < expenseCategory.length; i++) {
+      expense += expenseCategory[i].amount;
+    }
+    incomeTotalNotifier.value = income;
+    expenseTotalNotifier.value = expense;
+    double total = income - expense;
+    totalNotifier.value = total;
+    incomeTotalNotifier.notifyListeners();
+    expenseTotalNotifier.notifyListeners();
+    totalNotifier.notifyListeners();
+  }
+
+  @override
   Future<List<TransactionModel>> getTransactionCategories(
       CategoryType type, String name) async {
     final _transactionDB = await Hive.openBox<TransactionModel>(transactionDb);
     var result = _transactionDB.values
-        .where((val) => val.category.name == name)
-        .where((val) => val.category.type == type)
+        .where((val) => val.category == name)
+        .where((val) => val.type == type)
         .toList();
     return result;
   }

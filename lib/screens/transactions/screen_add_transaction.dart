@@ -16,12 +16,13 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends State<AddTransaction> {
   DateTime? _selectedDate;
   CategoryType? _selectedCategoryType;
-  CategoryModel? _selectedCategoryModel;
+  String? _categoryName;
 
   String? _categoryID;
 
   final _purposeTextEditingController = TextEditingController();
   final _amountTextEditingController = TextEditingController();
+  final _textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -34,16 +35,27 @@ class _AddTransactionState extends State<AddTransaction> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(15.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Center(
+                  child: Text(
+                "Add Transaction",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              )),
+              const SizedBox(
+                height: 50,
+              ),
               //purpose
               TextFormField(
                 controller: _purposeTextEditingController,
                 keyboardType: TextInputType.text,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Purpose'),
+                    border: OutlineInputBorder(), labelText: 'Purpose'),
               ),
               const SizedBox(
                 height: 10,
@@ -53,17 +65,21 @@ class _AddTransactionState extends State<AddTransaction> {
                 controller: _amountTextEditingController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Amount'),
+                    prefixText: "\u{20B9}",
+                    suffixText: "Rs.",
+                    border: OutlineInputBorder(),
+                    labelText: 'Amount'),
               ),
-              const SizedBox(height: 10,),
+              const SizedBox(
+                height: 10,
+              ),
               //Date
               TextButton.icon(
                 onPressed: () async {
                   final _selectedDateTemp = await showDatePicker(
                     context: context,
                     initialDate: DateTime.now(),
-                    firstDate:
-                        DateTime.now().subtract(const Duration(days: 49)),
+                    firstDate: DateTime(2022),
                     lastDate: DateTime.now(),
                   );
                   if (_selectedDateTemp == null) {
@@ -78,13 +94,15 @@ class _AddTransactionState extends State<AddTransaction> {
                 label: Text(
                   _selectedDate == null
                       ? 'Select Date'
-                      : DateFormat('dd-MM-yyyy')
-                          .format(_selectedDate!),
+                      : DateFormat('dd-MM-yyyy').format(_selectedDate!),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               //Category
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
@@ -97,7 +115,12 @@ class _AddTransactionState extends State<AddTransaction> {
                               _categoryID = null;
                             });
                           }),
-                      const Text('Income'),
+                      const Text(
+                        'Income',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   Row(
@@ -111,16 +134,93 @@ class _AddTransactionState extends State<AddTransaction> {
                               _categoryID = null;
                             });
                           }),
-                      const Text('Expense'),
+                      const Text(
+                        'Expense',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) {
+                              return SimpleDialog(
+                                title: Center(
+                                  child: Text(
+                                    (_selectedCategoryType ==
+                                            CategoryType.income)
+                                        ? "Add Income Category"
+                                        : "Add Expense Category",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: TextFormField(
+                                      controller: _textEditingController,
+                                      decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "Category Name"),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        final _name =
+                                            _textEditingController.text;
+                                        if (_name.isEmpty) {
+                                          return;
+                                        }
+                                        final _category = CategoryModel(
+                                            name: _name,
+                                            type: _selectedCategoryType!);
+                                        int result = await CategoryDB.instance
+                                            .insertCategory(_category);
+                                        Navigator.of(ctx).pop();
+                                        setState(() {
+                                          CategoryDB().refreshUI();
+                                          _categoryID = result.toString();
+                                          _categoryName = _name;
+                                        });
+                                      },
+                                      child: const Text(
+                                        "Add",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: const Icon(Icons.add),
+                      )
+                    ],
+                  )
                 ],
               ),
               //Category Type
               Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: DropdownButton<String>(
-                  hint: const Text('Select Category'),
+                  hint: const Text(
+                    '--Select Category--',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   value: _categoryID,
                   items: (_selectedCategoryType == CategoryType.income
                           ? CategoryDB.instance.incomeCategoryListListener
@@ -132,7 +232,7 @@ class _AddTransactionState extends State<AddTransaction> {
                         value: e.id.toString(),
                         child: Text(e.name),
                         onTap: () {
-                          _selectedCategoryModel = e;
+                          _categoryName = e.name;
                         },
                       );
                     },
@@ -145,6 +245,9 @@ class _AddTransactionState extends State<AddTransaction> {
                 ),
               ),
               //Submit
+              const SizedBox(
+                height: 20,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -152,7 +255,12 @@ class _AddTransactionState extends State<AddTransaction> {
                     onPressed: () {
                       addTransaction();
                     },
-                    child: const Text('Submit'),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -178,6 +286,7 @@ class _AddTransactionState extends State<AddTransaction> {
     if (_selectedDate == null) {
       return;
     }
+
     final _parsedAmount = double.tryParse(_amountText);
     if (_parsedAmount == null) {
       return;
@@ -187,7 +296,7 @@ class _AddTransactionState extends State<AddTransaction> {
       amount: _parsedAmount,
       date: _selectedDate!,
       type: _selectedCategoryType!,
-      category: _selectedCategoryModel!,
+      category: _categoryName!,
     );
     await TransactionDB.instance.insertTransaction(_transaction);
     Navigator.of(context).pop();

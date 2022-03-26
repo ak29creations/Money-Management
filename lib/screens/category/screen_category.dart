@@ -23,31 +23,50 @@ class _ScreenCategoryState extends State<ScreenCategory>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TabBar(
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey,
-          controller: _tabController,
-          tabs: const [
-            Tab(
-              text: 'INCOME',
+    return Container(
+      color: Colors.grey[200],
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Column(
+          children: [
+            const Text(
+              'Add Your Caterory',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
-            Tab(
-              text: 'EXPENSE',
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: TabBar(
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
+                controller: _tabController,
+                tabs: const [
+                  Tab(
+                    child: Text(
+                      "INCOME",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      "EXPENSE",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: const [
+                  IncomeCategoryList(),
+                  ExpenseCategoryList(),
+                ],
+              ),
             ),
           ],
         ),
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: const [
-              IncomeCategoryList(),
-              ExpenseCategoryList(),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

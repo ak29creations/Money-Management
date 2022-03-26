@@ -15,7 +15,7 @@ class TransactionModel {
   @HiveField(4)
   final CategoryType type;
   @HiveField(5)
-  final CategoryModel category;
+  final String category;
 
   TransactionModel(
       {required this.purpose,

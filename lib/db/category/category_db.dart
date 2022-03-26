@@ -6,7 +6,7 @@ const categoryDb = "category_db";
 
 abstract class CategoryDbFunctions {
   Future<List<CategoryModel>> getCategories();
-  Future<void> insertCategory(CategoryModel value);
+  Future<int> insertCategory(CategoryModel value);
   Future<void> deleteCategory(int categoryID);
 }
 
@@ -25,12 +25,14 @@ class CategoryDB implements CategoryDbFunctions {
       ValueNotifier([]);
 
   @override
-  Future<void> insertCategory(CategoryModel value) async {
+  Future<int> insertCategory(CategoryModel value) async {
     final _categoryDB = await Hive.openBox<CategoryModel>(categoryDb);
     final _id = await _categoryDB.add(value);
     value.id = _id;
     await _categoryDB.put(_id, value);
     refreshUI();
+    return _id;
+    
   }
 
   @override

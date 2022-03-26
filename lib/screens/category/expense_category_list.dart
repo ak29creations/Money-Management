@@ -18,7 +18,12 @@ class ExpenseCategoryList extends StatelessWidget {
               return Card(
                 elevation: 3,
                 child: ListTile(
-                  title: Text(category.name),
+                  title: Text(
+                    category.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   trailing: IconButton(
                     onPressed: () async {
                       List<TransactionModel> result =
@@ -32,7 +37,7 @@ class ExpenseCategoryList extends StatelessWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
-                                "Can’t Delete this Category. Transactions have been made."),
+                                "Can’t Delete this Expense category. Transactions have been made."),
                           ),
                         );
                       }

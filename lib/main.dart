@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/models/category/category_model.dart';
 import 'package:money_management/models/transaction/transaction_model.dart';
-import 'package:money_management/screens/home/screen_home.dart';
+import 'package:money_management/screens/home/widgets/bottom_navigation.dart';
 import 'package:money_management/screens/transactions/screen_add_transaction.dart';
 
 Future<void> main() async {
@@ -30,8 +30,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+      fontFamily: "Cardo",
       ),
-      home: const ScreenHome(),
+      home: const MoneyManagementBottomNavigation(),
       routes: {
         AddTransaction.routeName:(ctx)=> const AddTransaction(),
       },

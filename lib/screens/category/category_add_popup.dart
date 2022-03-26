@@ -11,7 +11,13 @@ Future<void> showCategoryAddPopup(BuildContext context) async {
     context: context,
     builder: (ctx) {
       return SimpleDialog(
-        title: const Center(child: Text("Add Category")),
+        title: const Center(
+            child: Text(
+          "Add Category",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        )),
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -39,12 +45,15 @@ Future<void> showCategoryAddPopup(BuildContext context) async {
                   return;
                 }
                 final _category = CategoryModel(
-                    name: _name,
-                    type: selectedCategoryNotifier.value);
+                    name: _name, type: selectedCategoryNotifier.value);
                 CategoryDB.instance.insertCategory(_category);
                 Navigator.of(ctx).pop();
               },
-              child: const Text("Add"),
+              child: const Text("Add",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           )
         ],
@@ -83,7 +92,10 @@ class RadioButton extends StatelessWidget {
             );
           },
         ),
-        Text(title),
+        Text(title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),),
       ],
     );
   }

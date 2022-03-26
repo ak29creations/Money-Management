@@ -28,71 +28,73 @@ class ScreenTransaction extends StatelessWidget {
                     topRight: Radius.circular(25)),
                 child: Container(
                   color: Colors.grey[200],
-                  child: ListView.separated(
-                    padding: const EdgeInsets.only(left: 10,right: 10,bottom: 10,top: 15),
-                    itemBuilder: (ctx, index) {
-                      final _value = newList[index];
-                      return Slidable(
-                        key: Key(_value.id.toString()),
-                        startActionPane: ActionPane(
-                          motion: const DrawerMotion(),
-                          children: [
-                            SlidableAction(
-                              onPressed: (ctx) {
-                                TransactionDB.instance
-                                    .deleteTransaction(_value.id!);
-                              },
-                              foregroundColor: Colors.red,
-                              icon: Icons.delete,
-                              label: 'Delete',
-                            ),
-                          ],
-                        ),
-                        child: Card(
-                          elevation: 3,
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              radius: 50,
-                              child: Text(
-                                parseDate(_value.date),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600,
+                  child: newList.isEmpty
+                      ? const Center(child: Text("⚠️ No Transactions Found"))
+                      : ListView.separated(
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, bottom: 10, top: 15),
+                          itemBuilder: (ctx, index) {
+                            final _value = newList[index];
+                            return Slidable(
+                              key: Key(_value.id.toString()),
+                              startActionPane: ActionPane(
+                                motion: const DrawerMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (ctx) {
+                                      TransactionDB.instance
+                                          .deleteTransaction(_value.id!);
+                                    },
+                                    foregroundColor: Colors.red,
+                                    icon: Icons.delete,
+                                    label: 'Delete',
+                                  ),
+                                ],
+                              ),
+                              child: Card(
+                                elevation: 3,
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    radius: 50,
+                                    child: Text(
+                                      parseDate(_value.date),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        _value.type == CategoryType.income
+                                            ? Colors.green[300]
+                                            : Colors.red[300],
+                                  ),
+                                  title: Text(
+                                    (_value.type == CategoryType.income
+                                            ? "+ "
+                                            : "- ") +
+                                        "\u{20B9}${_value.amount.toString()}",
+                                    style: TextStyle(
+                                      color: _value.type == CategoryType.income
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                      _value.category + " - " + _value.purpose),
                                 ),
                               ),
-                              backgroundColor:
-                                  _value.type == CategoryType.income
-                                      ? Colors.green[300]
-                                      : Colors.red[300],
-                            ),
-                            title: Text(
-                              (_value.type == CategoryType.income
-                                      ? "+ "
-                                      : "- ") +
-                                  "\u{20B9}${_value.amount.toString()}",
-                              style: TextStyle(
-                                color: _value.type == CategoryType.income
-                                    ? Colors.green
-                                    : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                              ),
-                              
-                            ),
-                            subtitle:
-                                Text(_value.category + " - " + _value.purpose),
-                          ),
+                            );
+                          },
+                          separatorBuilder: (ctx, index) {
+                            return const SizedBox(
+                              height: 5,
+                            );
+                          },
+                          itemCount: newList.length,
                         ),
-                      );
-                    },
-                    separatorBuilder: (ctx, index) {
-                      return const SizedBox(
-                        height: 5,
-                      );
-                    },
-                    itemCount: newList.length,
-                  ),
                 ),
               ),
             );

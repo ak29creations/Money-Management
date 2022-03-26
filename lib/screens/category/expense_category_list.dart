@@ -12,51 +12,55 @@ class ExpenseCategoryList extends StatelessWidget {
     return ValueListenableBuilder(
         valueListenable: CategoryDB().expenseCategoryListListener,
         builder: (BuildContext ctx, List<CategoryModel> newList, Widget? _) {
-          return ListView.separated(
-            itemBuilder: (ctx, index) {
-              final category = newList[index];
-              return Card(
-                elevation: 3,
-                child: ListTile(
-                  title: Text(
-                    category.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  trailing: IconButton(
-                    onPressed: () async {
-                      List<TransactionModel> result =
-                          await TransactionDB.instance.getTransactionCategories(
-                              category.type, category.name);
-
-                      if (result.isEmpty) {
-                        CategoryDB.instance.deleteCategory(category.id!);
-                      } else {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                "Can’t Delete this Expense category. Transactions have been made."),
+          return newList.isEmpty
+              ? const Center(child: Text("⚠️ No Expense Categories Found"))
+              : ListView.separated(
+                  itemBuilder: (ctx, index) {
+                    final category = newList[index];
+                    return Card(
+                      elevation: 3,
+                      child: ListTile(
+                        title: Text(
+                          category.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
                           ),
-                        );
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-              );
-            },
-            separatorBuilder: (ctx, index) {
-              return const SizedBox(
-                height: 5,
-              );
-            },
-            itemCount: newList.length,
-          );
+                        ),
+                        trailing: IconButton(
+                          onPressed: () async {
+                            List<TransactionModel> result = await TransactionDB
+                                .instance
+                                .getTransactionCategories(
+                                    category.type, category.name);
+
+                            if (result.isEmpty) {
+                              CategoryDB.instance.deleteCategory(category.id!);
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      "Can’t Delete this Expense category. Transactions have been made."),
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (ctx, index) {
+                    return const SizedBox(
+                      height: 5,
+                    );
+                  },
+                  itemCount: newList.length,
+                );
         });
   }
 }
